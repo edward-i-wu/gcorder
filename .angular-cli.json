@@ -9,7 +9,17 @@
       "outDir": "dist",
       "assets": [
         "assets",
-        "favicon.ico"
+        "assets/favicon.ico",
+        {
+          "glob": "worker.js",
+          "input": "./worker",
+          "output": "./worker"
+        },
+        {
+          "glob": "lame.min.js",
+          "input": "../node_modules/lamejs",
+          "output": "./worker"
+        }
       ],
       "index": "index.html",
       "main": "main.ts",
