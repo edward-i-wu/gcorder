@@ -10,9 +10,10 @@ import { WebRtcTestComponent } from './web-rtc-test/web-rtc-test.component';
 import {WebRtcRoutingModule} from './web-rtc-routing.module';
 import {Mp3BlobService} from './services/mp3-blob.service';
 import {ClientLoadService} from './services/client-load.service';
-import {HttpClientModule} from '@angular/common/http';
+import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {GdriveUploadService} from './services/gdrive-upload.service';
 import {BlobBufferService} from './services/blob-buffer.service';
+import {Resumable308Interceptor} from './services/resumable308-interceptor.service';
 
 @NgModule({
   imports: [
@@ -36,7 +37,12 @@ export class WebRtcModule {
         Mp3BlobService,
         ClientLoadService,
         GdriveUploadService,
-        BlobBufferService
+        BlobBufferService,
+        // {
+        //   provide: HTTP_INTERCEPTORS,
+        //   useClass: Resumable308Interceptor,
+        //   multi: true
+        // }
       ]
     };
   }

@@ -19,8 +19,12 @@ export class ClientLoadService {
   }
 
   async init() {
-    await this.loadClient();
-    await this.initClient();
+    try {
+      await this.loadClient();
+      await this.initClient();
+    } catch (e) {
+      console.error(e);
+    }
     this.initSignInListener();
   }
 

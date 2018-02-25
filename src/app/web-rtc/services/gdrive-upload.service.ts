@@ -1,10 +1,9 @@
 import {Injectable, OnDestroy} from '@angular/core';
 import {HttpClient, HttpErrorResponse, HttpHeaders, HttpResponse} from '@angular/common/http';
-import {BlobBufferService} from './blob-buffer.service';
+import {BlobBufferService, BUFFER_SIZE} from './blob-buffer.service';
 import {Observable} from 'rxjs/Observable';
 import {Subject} from 'rxjs/Subject';
 import {Subscription} from 'rxjs/Subscription';
-import {queue} from 'rxjs/scheduler/queue';
 
 @Injectable()
 export class GdriveUploadService implements OnDestroy {
@@ -38,7 +37,7 @@ export class GdriveUploadService implements OnDestroy {
             headers: new HttpHeaders({
               'Content-Length': `${blob.size}`,
               'Content-Type': 'audio/mp3',
-              'Content-Range': `bytes ${this.byteProgress}-${this.byteProgress + blob.size - 1}/${blob.size}`
+              'Content-Range': `bytes ${this.byteProgress}-${this.byteProgress + blob.size - 1}/${blob.size < BUFFER_SIZE ? this.byteProgress + blob.size : '*'}`
             })
           }
         )
@@ -57,7 +56,22 @@ export class GdriveUploadService implements OnDestroy {
           console.log(response);
           queueControl.next();
         },
-          console.error
+        console.error,
+        () => {
+          // complete the upload by posting Content-Range: 100%
+          this.http.post<string>(
+            this.uploadUrl,
+            null,
+            {
+              responseType: 'text' as 'json',
+              headers: new HttpHeaders({
+                'Content-Length': '0',
+                'Content-Type': 'audio/mp3',
+                'Content-Range': `bytes ${this.byteProgress}-${this.byteProgress}/${this.byteProgress}`
+              })
+            }
+          ).subscribe(console.log, console.error);
+        }
       );
     queueControl.next();
   }
