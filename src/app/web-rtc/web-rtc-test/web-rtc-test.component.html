@@ -8,3 +8,13 @@
 <button (click)="signIn()">Sign In</button>
 <button (click)="signOut()">Sign Out</button>
 <button (click)="initUpload()">Init Upload</button>
+<!--<div *ngIf="userProfile$ | async as userProfile">-->
+  <!--<h3>{{ userProfile.getName() }}</h3>-->
+  <!--<h3>{{ userProfile.getEmail() }}</h3>-->
+  <!--<img [src]="userProfile.getImageUrl()">-->
+<!--</div>-->
+<div *ngIf="userProfile">
+  <h3>{{ userProfile.getName() }}</h3>
+  <h3>{{ userProfile.getEmail() }}</h3>
+  <img [src]="userProfile.getImageUrl()">
+</div>

@@ -1,4 +1,7 @@
-import {AfterViewChecked, Component, ElementRef, OnChanges, OnInit, ViewChild} from '@angular/core';
+import {
+  AfterViewChecked, ApplicationRef, Component, ElementRef, NgZone, OnChanges, OnInit,
+  ViewChild
+} from '@angular/core';
 import {UserMediaService} from '../services/user-media.service';
 import {PcmDataService} from '../services/pcm-data.service';
 import {Mp3BlobService} from '../services/mp3-blob.service';
@@ -22,8 +25,11 @@ export class WebRtcTestComponent implements OnInit, AfterViewChecked {
   private prevAudioSrc: String;
 
   public storedMp3: SafeResourceUrl;
-  public isSignedIn$: Observable<boolean>;
   private accessToken: string;
+  public userProfile$: Observable<any>;
+  public userProfile;
+  public googleAuth$: Observable<any>;
+  public googleAuth;
 
 
   constructor(private userMedia: UserMediaService,
@@ -31,13 +37,21 @@ export class WebRtcTestComponent implements OnInit, AfterViewChecked {
               private mp3Blob: Mp3BlobService,
               private sanitizer: DomSanitizer,
               private clientLoad: ClientLoadService,
-              private gdriveUpload: GdriveUploadService) {
-    this.isSignedIn$ = this.clientLoad.$;
-    this.clientLoad.accessToken$.subscribe(accessToken => this.accessToken = accessToken);
-  }
+              private gdriveUpload: GdriveUploadService,
+              private appRef: ApplicationRef
+  ) { }
 
   ngOnInit() {
-    this.clientLoad.init();
+    this.gdriveUpload.init();
+    this.gdriveUpload.$.subscribe(console.log, console.error);
+    this.googleAuth$ = this.clientLoad.$;
+    this.googleAuth$.subscribe(auth => this.googleAuth = auth);
+    this.userProfile$ = this.clientLoad.$.map(auth => auth.currentUser.get().getBasicProfile());
+    // TODO hacking change detection b/c I can't figure out running the auth init in ngZone
+    this.userProfile$.subscribe(userProfile => {
+      this.userProfile = userProfile;
+      this.appRef.tick();
+    }, console.error);
 
     const stored = localStorage.getItem('mp3');
     if (stored) {
@@ -73,7 +87,6 @@ export class WebRtcTestComponent implements OnInit, AfterViewChecked {
   }
 
   start() {
-    this.gdriveUpload.init(this.accessToken);
     this.mp3Blob.init();
     this.pcmData.start();
   }
@@ -87,14 +100,15 @@ export class WebRtcTestComponent implements OnInit, AfterViewChecked {
   }
 
   signIn() {
-    this.clientLoad.signIn();
+    this.googleAuth.signIn();
   }
 
   signOut() {
-    this.clientLoad.signOut();
+    this.googleAuth.signOut();
   }
 
   initUpload() {
+    this.appRef.tick();
     // this.gdriveUpload.initData();
     // this.gdriveUpload.initiateSession(this.accessToken);
   }
