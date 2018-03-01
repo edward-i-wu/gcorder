@@ -1,0 +1,45 @@
+.record-button {
+  display: flex;
+  flex-direction: row;
+  width: 200px;
+  box-sizing: border-box;
+}
+.left-semi {
+  position: relative;
+  height: 200px;
+  width: 100px;
+  border-radius: 100px 0 0 100px;
+  background-color: red;
+  transition: border-radius 0.5s, margin 0.5s, width 0.5s;
+}
+.right-semi {
+  position: relative;
+  height: 200px;
+  width: 100px;
+  border-radius: 0 100px 100px 0;
+  background-color: red;
+  transition: border-radius 0.5s, margin 0.5s, width 0.5s;
+}
+
+.right-paused {
+  width: 90px;
+  border-radius: 5px;
+}
+.left-paused {
+  width: 90px;
+  border-radius: 5px;
+  margin: 0 20px 0 0;
+}
+
+.time {
+  font-size: 4em;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left:0;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Roboto', sans-serif;
+}

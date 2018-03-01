@@ -9,6 +9,9 @@ import {Observable} from 'rxjs/Observable';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
 import {ClientLoadService} from '../services/client-load.service';
 import {GdriveUploadService} from '../services/gdrive-upload.service';
+import {AnimationFrameScheduler} from 'rxjs/scheduler/AnimationFrameScheduler';
+import {Scheduler} from 'rxjs/Rx';
+import {ISubscription} from 'rxjs/Subscription';
 
 @Component({
   selector: 'app-web-rtc-test',
@@ -30,6 +33,10 @@ export class WebRtcTestComponent implements OnInit, AfterViewChecked {
   public userProfile;
   public googleAuth$: Observable<any>;
   public googleAuth;
+  public paused = true;
+  private startTime: Date;
+  public elapsedTime: Date = new Date(0);
+  private timeSubscription: ISubscription;
 
 
   constructor(private userMedia: UserMediaService,
@@ -111,6 +118,19 @@ export class WebRtcTestComponent implements OnInit, AfterViewChecked {
     this.appRef.tick();
     // this.gdriveUpload.initData();
     // this.gdriveUpload.initiateSession(this.accessToken);
+  }
+
+  record() {
+    if (this.paused) {
+      this.startTime = new Date();
+      this.timeSubscription = Observable.interval(0, Scheduler.animationFrame)
+        .subscribe(() => this.elapsedTime = new Date(Date.now() - this.startTime.getTime()));
+    }
+    if (!this.paused) {
+      this.timeSubscription.unsubscribe();
+      this.elapsedTime = new Date(0);
+    }
+    this.paused = !this.paused;
   }
 
 }

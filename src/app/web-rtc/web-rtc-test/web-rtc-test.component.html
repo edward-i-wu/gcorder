@@ -18,3 +18,13 @@
   <h3>{{ userProfile.getEmail() }}</h3>
   <img [src]="userProfile.getImageUrl()">
 </div>
+
+<div class="record-button" (click)="record()">
+  <div class="left-semi" [ngClass]="{'left-paused': !paused}">
+    <div class="time">{{ elapsedTime | date:'mm' }}</div>
+  </div>
+  <div class="right-semi" [ngClass]="{'right-paused': !paused}">
+    <div class="time">{{ elapsedTime | date:'ss' }}</div>
+  </div>
+  <!--<div class="time">{{ elapsedTime | date:'mm:ss' }}</div>-->
+</div>
