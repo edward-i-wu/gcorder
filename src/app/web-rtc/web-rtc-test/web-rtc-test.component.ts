@@ -7,20 +7,20 @@ import {PcmDataService} from '../services/pcm-data.service';
 import {Mp3BlobService} from '../services/mp3-blob.service';
 import {Observable} from 'rxjs/Observable';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
-import {ClientLoadService} from '../services/client-load.service';
 import {GdriveUploadService} from '../services/gdrive-upload.service';
-import {AnimationFrameScheduler} from 'rxjs/scheduler/AnimationFrameScheduler';
 import {Scheduler} from 'rxjs/Rx';
 import {ISubscription} from 'rxjs/Subscription';
+import {GoogleAuthService} from '../../google-oauth/services/google-auth.service';
+import {GoogleUserService} from '../../google-oauth/services/google-user.service';
 
 @Component({
   selector: 'app-web-rtc-test',
   templateUrl: './web-rtc-test.component.html',
-  styleUrls: ['./web-rtc-test.component.css']
+  styleUrls: ['./web-rtc-test.component.scss']
 })
 export class WebRtcTestComponent implements OnInit, AfterViewChecked {
 
-  public mp3Url$: Observable<String> = Observable.never();
+  public mp3Url$: Observable<SafeResourceUrl> = Observable.never();
 
   @ViewChild('playback') playback: ElementRef;
   @ViewChild('playbackSource') playbackSource: ElementRef;
@@ -43,17 +43,18 @@ export class WebRtcTestComponent implements OnInit, AfterViewChecked {
               private pcmData: PcmDataService,
               private mp3Blob: Mp3BlobService,
               private sanitizer: DomSanitizer,
-              private clientLoad: ClientLoadService,
+              private googleAuthService: GoogleAuthService,
               private gdriveUpload: GdriveUploadService,
+              private googleUser: GoogleUserService,
               private appRef: ApplicationRef
   ) { }
 
   ngOnInit() {
     this.gdriveUpload.init();
     this.gdriveUpload.$.subscribe(console.log, console.error);
-    this.googleAuth$ = this.clientLoad.$;
+    this.googleAuth$ = this.googleAuthService.$;
     this.googleAuth$.subscribe(auth => this.googleAuth = auth);
-    this.userProfile$ = this.clientLoad.$.map(auth => auth.currentUser.get().getBasicProfile());
+    this.userProfile$ = this.googleAuthService.$.map(auth => auth.currentUser.get().getBasicProfile());
     // TODO hacking change detection b/c I can't figure out running the auth init in ngZone
     this.userProfile$.subscribe(userProfile => {
       this.userProfile = userProfile;
@@ -107,11 +108,11 @@ export class WebRtcTestComponent implements OnInit, AfterViewChecked {
   }
 
   signIn() {
-    this.googleAuth.signIn();
+    this.googleUser.signIn();
   }
 
   signOut() {
-    this.googleAuth.signOut();
+    this.googleUser.signOut();
   }
 
   initUpload() {
@@ -124,13 +125,18 @@ export class WebRtcTestComponent implements OnInit, AfterViewChecked {
     if (this.paused) {
       this.startTime = new Date();
       this.timeSubscription = Observable.interval(0, Scheduler.animationFrame)
-        .subscribe(() => this.elapsedTime = new Date(Date.now() - this.startTime.getTime()));
+        .subscribe(() => {
+          this.elapsedTime = new Date(Date.now() - this.startTime.getTime());
+          this.appRef.tick();
+        });
     }
     if (!this.paused) {
       this.timeSubscription.unsubscribe();
       this.elapsedTime = new Date(0);
     }
     this.paused = !this.paused;
+    // TODO got to figure out ngZone!
+    this.appRef.tick();
   }
 
 }

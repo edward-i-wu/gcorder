@@ -1,1 +1,9 @@
-<router-outlet></router-outlet>
+<div class="mat-app-background">
+  <button mat-icon-button [matMenuTriggerFor]="menu">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <mat-menu #menu="matMenu">
+  </mat-menu>
+  <router-outlet></router-outlet>
+</div>
+

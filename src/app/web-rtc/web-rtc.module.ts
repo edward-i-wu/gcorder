@@ -7,9 +7,7 @@ import {PcmDataService} from './services/pcm-data.service';
 import {UserMediaService} from './services/user-media.service';
 import {VolumeDataService} from './services/volume-data.service';
 import { WebRtcTestComponent } from './web-rtc-test/web-rtc-test.component';
-import {WebRtcRoutingModule} from './web-rtc-routing.module';
 import {Mp3BlobService} from './services/mp3-blob.service';
-import {ClientLoadService} from './services/client-load.service';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {GdriveUploadService} from './services/gdrive-upload.service';
 import {BlobBufferService} from './services/blob-buffer.service';
@@ -18,8 +16,7 @@ import {Resumable308Interceptor} from './services/resumable308-interceptor.servi
 @NgModule({
   imports: [
     CommonModule,
-    HttpClientModule,
-    WebRtcRoutingModule
+    HttpClientModule
   ],
   declarations: [WebRtcTestComponent]
 })
@@ -35,7 +32,6 @@ export class WebRtcModule {
         UserMediaService,
         VolumeDataService,
         Mp3BlobService,
-        ClientLoadService,
         GdriveUploadService,
         BlobBufferService,
         // {

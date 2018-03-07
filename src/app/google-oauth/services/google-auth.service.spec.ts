@@ -1,15 +1,15 @@
 import { TestBed, inject } from '@angular/core/testing';
 
-import { ClientLoadService } from './client-load.service';
+import { GoogleAuthService } from './client-load.service';
 
 describe('GoogleAuthService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [ClientLoadService]
+      providers: [GoogleAuthService]
     });
   });
 
-  it('should be created', inject([ClientLoadService], (service: ClientLoadService) => {
+  it('should be created', inject([GoogleAuthService], (service: GoogleAuthService) => {
     expect(service).toBeTruthy();
   }));
 });

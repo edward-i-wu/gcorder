@@ -5,6 +5,7 @@ import {Observable} from 'rxjs/Observable';
 import {Subject} from 'rxjs/Subject';
 import {Subscription} from 'rxjs/Subscription';
 import {ClientLoadService} from './client-load.service';
+import {GoogleAuthService} from '../../google-oauth/services/google-auth.service';
 
 @Injectable()
 export class GdriveUploadService implements OnDestroy {
@@ -12,12 +13,12 @@ export class GdriveUploadService implements OnDestroy {
   private subscription: Subscription;
   private uploadUrl: string;
   private byteProgress = 0;
-  private progress$: Observable<HttpErrorResponse>;
+  private progress$: Observable<String | HttpErrorResponse>;
 
   constructor(
     private http: HttpClient,
     private blobBuffer: BlobBufferService,
-    private clientLoad: ClientLoadService
+    private googleAuth: GoogleAuthService
   ) { }
 
   get $() {
@@ -27,7 +28,7 @@ export class GdriveUploadService implements OnDestroy {
   init() {
     // initialize sources
     this.blobBuffer.init();
-    this.clientLoad.init();
+    // this.googleAuth.init();
 
     // create queue and queueControl to ensure chunk uploads happen in sequence
     const queueControl = new Subject();
@@ -43,7 +44,7 @@ export class GdriveUploadService implements OnDestroy {
     this.progress$ = Observable.zip(
       // when the access token is available
       Observable.of(blobQueue),
-      this.clientLoad.$.map(auth => auth.currentUser.get().getAuthResponse(true).access_token),
+      this.googleAuth.$.map(auth => auth.currentUser.get().getAuthResponse(true).access_token),
       (blobQueue$, accessToken) => {
         // initialize the resumable upload
         return this.http.post<string>(
@@ -54,7 +55,6 @@ export class GdriveUploadService implements OnDestroy {
             headers: new HttpHeaders({
               'Authorization': `Bearer ${accessToken}`,
               'X-Upload-Content-Type': 'audio/mp3',
-              //'Content-Length': '0'
             }),
             observe: 'response'
           }).switchMap((resp: HttpResponse<string>) => {
@@ -71,7 +71,6 @@ export class GdriveUploadService implements OnDestroy {
               {
                 responseType: 'text' as 'json',
                 headers: new HttpHeaders({
-                  //'Content-Length': `${blob.size}`,
                   'Content-Type': 'audio/mp3',
                   'Content-Range': `bytes ${this.byteProgress}-${this.byteProgress + blob.size - 1}/${blob.size < BUFFER_SIZE ? this.byteProgress + blob.size : '*'}`
                 })
