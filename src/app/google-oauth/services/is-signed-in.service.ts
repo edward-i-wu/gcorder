@@ -2,6 +2,7 @@ import {Injectable, NgZone} from '@angular/core';
 import {GoogleAuthService} from './google-auth.service';
 import {Observable} from 'rxjs/Observable';
 import {Subject} from 'rxjs/Subject';
+import {ReplaySubject} from 'rxjs/ReplaySubject';
 
 @Injectable()
 export class IsSignedInService {
@@ -33,7 +34,9 @@ export class IsSignedInService {
       // const listener = googleAuth.isSignedIn.listen.bind(googleAuth.isSignedIn);
       return Observable.bindCallback(zonedListener)();
     });
-    this.isSignedIn$ = Observable.merge(currentState, futureStates, this.onSignIn$);
+    this.isSignedIn$ = Observable.merge(currentState, futureStates, this.onSignIn$)
+      .multicast(new ReplaySubject(1))
+      .refCount();
   }
 
   signIn() {
