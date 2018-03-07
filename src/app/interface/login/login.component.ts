@@ -21,12 +21,12 @@ export class LoginComponent implements OnInit {
       if (isSignedIn) {
         this.router.navigate(['webrtc']);
       }
-    });
+    }, console.error);
 
   }
 
   signIn() {
-    this.googleUser.signIn();
+    this.isSignedIn.signIn();
   }
 
 }

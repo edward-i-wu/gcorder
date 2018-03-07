@@ -1,5 +1,10 @@
 @import '~@angular/material/theming';
 
+.recordings {
+  display: flex;
+  justify-content: center;
+}
+
 .record-button {
   display: flex;
   flex-direction: row;
@@ -46,4 +51,46 @@
   align-items: center;
   justify-content: center;
   font-family: 'Roboto', sans-serif;
+}
+
+.record-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stop-button-container {
+  padding: 20px 0 20px 0;
+  width: 250px;
+  height: 50px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.stop-button-initial {
+  height: 0px;
+  width: 0px;
+  border-radius: 5px;
+  background-color: red;
+  @include mat-elevation(4);
+  transition: width 0.5s, height 0.5s;
+}
+
+.stop-button-live {
+  height: 50px;
+  width: 50px;
+}
+
+.paused {
+  animation: flash 1s ease-in-out 1s infinite alternate
+}
+
+@keyframes flash {
+  from {
+    @include mat-elevation(4);
+  }
+  to {
+    @include mat-elevation(12);
+  }
 }

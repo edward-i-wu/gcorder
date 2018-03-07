@@ -1,30 +1,32 @@
-<button (click)="start()">Start</button>
-<button (click)="pause()">Pause</button>
-<button (click)="stop()">Stop</button>
-<audio #playback controls="controls">
-  <source #playbackSource [src]="(mp3Url$ | async) || ''" type="audio/mp3">
-  <source #playbackSourceStored [src]="storedMp3" type="audio/mp3">
-</audio>
-<button (click)="signIn()">Sign In</button>
-<button (click)="signOut()">Sign Out</button>
-<button (click)="initUpload()">Init Upload</button>
-<!--<div *ngIf="userProfile$ | async as userProfile">-->
-  <!--<h3>{{ userProfile.getName() }}</h3>-->
-  <!--<h3>{{ userProfile.getEmail() }}</h3>-->
-  <!--<img [src]="userProfile.getImageUrl()">-->
-<!--</div>-->
-<div *ngIf="userProfile">
-  <h3>{{ userProfile.getName() }}</h3>
-  <h3>{{ userProfile.getEmail() }}</h3>
-  <img [src]="userProfile.getImageUrl()">
-</div>
+<section class="record-buttons">
+  <div class="record-button" (click)="record()">
+    <div class="left-semi" [ngClass]="{'left-paused': !paused, 'paused': paused && recording}">
+      <div class="time">{{ elapsedTime | date:'mm' }}</div>
+    </div>
+    <div class="right-semi" [ngClass]="{'right-paused': !paused, 'paused': paused && recording}">
+      <div class="time">{{ elapsedTime | date:'ss' }}</div>
+    </div>
+    <!--<div class="time">{{ elapsedTime | date:'mm:ss' }}</div>-->
+  </div>
+  <div class="stop-button-container">
+    <div class="stop-button-initial" [ngClass]="{'stop-button-live': recording}" (click)="stopRecording()"></div>
+  </div>
+</section>
+<section class="recordings">
+  <audio #playback controls="controls">
+    <source #playbackSource [src]="(mp3Url$ | async) || ''" type="audio/mp3">
+    <source #playbackSourceStored [src]="storedMp3" type="audio/mp3">
+  </audio>
+</section>
 
-<div class="record-button" (click)="record()">
-  <div class="left-semi" [ngClass]="{'left-paused': !paused}">
-    <div class="time">{{ elapsedTime | date:'mm' }}</div>
-  </div>
-  <div class="right-semi" [ngClass]="{'right-paused': !paused}">
-    <div class="time">{{ elapsedTime | date:'ss' }}</div>
-  </div>
-  <!--<div class="time">{{ elapsedTime | date:'mm:ss' }}</div>-->
-</div>
+<!--<div *ngIf="userProfile$ | async as userProfile">-->
+<!--<h3>{{ userProfile.getName() }}</h3>-->
+<!--<h3>{{ userProfile.getEmail() }}</h3>-->
+<!--<img [src]="userProfile.getImageUrl()">-->
+<!--</div>-->
+<!--<div *ngIf="userProfile">-->
+<!--<h3>{{ userProfile.getName() }}</h3>-->
+<!--<h3>{{ userProfile.getEmail() }}</h3>-->
+<!--<img [src]="userProfile.getImageUrl()">-->
+<!--</div>-->
+

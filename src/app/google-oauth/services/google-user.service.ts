@@ -39,4 +39,8 @@ export class GoogleUserService {
     this.googleAuth.signOut();
   }
 
+  revoke() {
+    this.googleAuth.disconnect();
+  }
+
 }

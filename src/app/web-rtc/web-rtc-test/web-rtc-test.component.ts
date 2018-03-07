@@ -34,9 +34,11 @@ export class WebRtcTestComponent implements OnInit, AfterViewChecked {
   public googleAuth$: Observable<any>;
   public googleAuth;
   public paused = true;
+  public recording = false;
   private startTime: Date;
   public elapsedTime: Date = new Date(0);
-  private timeSubscription: ISubscription;
+  private timer: Observable<number>;
+  private timeControl: ISubscription;
 
 
   constructor(private userMedia: UserMediaService,
@@ -117,26 +119,36 @@ export class WebRtcTestComponent implements OnInit, AfterViewChecked {
 
   initUpload() {
     this.appRef.tick();
-    // this.gdriveUpload.initData();
-    // this.gdriveUpload.initiateSession(this.accessToken);
   }
 
   record() {
+    this.recording = true;
     if (this.paused) {
-      this.startTime = new Date();
-      this.timeSubscription = Observable.interval(0, Scheduler.animationFrame)
-        .subscribe(() => {
-          this.elapsedTime = new Date(Date.now() - this.startTime.getTime());
-          this.appRef.tick();
-        });
+      this.start();
+      this.startTime = new Date(Date.now() - this.elapsedTime.getTime());
+      if (this.elapsedTime.getTime() === new Date(0).getTime()) { // start timer if not started
+        this.timer = Observable.interval(0, Scheduler.animationFrame).share();
+      }
+      this.timeControl = this.timer.subscribe(() => {
+        this.elapsedTime = new Date(Date.now() - this.startTime.getTime());
+        this.appRef.tick();
+      });
     }
     if (!this.paused) {
-      this.timeSubscription.unsubscribe();
-      this.elapsedTime = new Date(0);
+      this.pause();
+      this.timeControl.unsubscribe();
     }
     this.paused = !this.paused;
     // TODO got to figure out ngZone!
     this.appRef.tick();
+  }
+
+  stopRecording() {
+    this.stop();
+    this.recording = false;
+    this.paused = true;
+    this.timeControl.unsubscribe();
+    this.elapsedTime = new Date(0);
   }
 
 }

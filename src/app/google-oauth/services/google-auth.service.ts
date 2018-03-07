@@ -23,16 +23,18 @@ export class GoogleAuthService {
 
     this.googleAuth$ = auth2Load$.switchMap(() => {
       const pipe: ReplaySubject<any> = new ReplaySubject(1);
-      this._ngZone.run(() => {
-          gapi.auth2.init({
-            client_id: '1001160351132-p1fh24qd1s7ne1ffd6fj6nhil67nao39.apps.googleusercontent.com',
-            scope: 'https://www.googleapis.com/auth/drive.file'
-          }).then(pipe.next.bind(pipe), pipe.error.bind(pipe));
-      });
+      gapi.auth2.init({
+        client_id: '1001160351132-p1fh24qd1s7ne1ffd6fj6nhil67nao39.apps.googleusercontent.com',
+        scope: 'https://www.googleapis.com/auth/drive.file'
+      }).then((googleAuth) => {
+          this._ngZone.run(() => pipe.next(googleAuth));
+        }, (error) => {
+          this._ngZone.run(() => pipe.error(error));
+        }
+      );
       return pipe.multicast(new ReplaySubject(1)).refCount().do(console.log);
     });
-
-    // TODO better understand ngZone
+    
     this._ngZone.run(() => {
       gapi.load('client', {
         callback: auth2Load$.next.bind(auth2Load$),

@@ -3,6 +3,8 @@
     <mat-icon>menu</mat-icon>
   </button>
   <mat-menu #menu="matMenu">
+    <button mat-menu-item (click)="signOut()">SIGN OUT</button>
+    <button mat-menu-item (click)="revoke()">REVOKE PERMISSIONS</button>
   </mat-menu>
   <router-outlet></router-outlet>
 </div>
