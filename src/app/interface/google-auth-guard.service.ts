@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
 import {Observable} from 'rxjs/Observable';
-import {IsSignedInService} from '../google-oauth/service/is-signed-in.service';
+import {GoogleAuthService} from '../google-oauth/service/google-auth.service';
 
 @Injectable()
 export class GoogleAuthGuardService implements CanActivate {
 
-  constructor(private isSignedIn: IsSignedInService, private router: Router) { }
+  constructor(private googleAuthService: GoogleAuthService, private router: Router) { }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
-    return this.isSignedIn.$.do((isSignedIn: boolean) => {
+    return this.googleAuthService.isSignedIn$.do((isSignedIn: boolean) => {
       if (!isSignedIn) {
         this.router.navigate(['login']);
       }

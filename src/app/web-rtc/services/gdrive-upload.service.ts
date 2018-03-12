@@ -44,7 +44,7 @@ export class GdriveUploadService implements OnDestroy {
     this.progress$ = Observable.zip(
       // when the access token is available
       Observable.of(blobQueue),
-      this.googleAuth.$.map(auth => auth.currentUser.get().getAuthResponse(true).access_token),
+      this.googleAuth.googleAuth$.map(auth => auth.currentUser.get().getAuthResponse(true).access_token),
       (blobQueue$, accessToken) => {
         // initialize the resumable upload
         return this.http.post<string>(

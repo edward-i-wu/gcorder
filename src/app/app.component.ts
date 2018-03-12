@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import {GoogleUserService} from './google-oauth/service/google-user.service';
-import {Router} from '@angular/router';
+
+import {GoogleAuthService} from './google-oauth/service/google-auth.service';
 
 @Component({
   selector: 'app-root',
@@ -11,16 +11,14 @@ export class AppComponent {
   title = 'app';
 
   // TODO don't put stuff in appComponent?
-  constructor(private googleUser: GoogleUserService, private router: Router) {}
+  constructor(private googleAuthService: GoogleAuthService) {}
 
   signOut() {
-    this.googleUser.signOut();
-    this.router.navigate(['login']);
+    this.googleAuthService.signOut();
   }
 
   revoke() {
-    this.googleUser.revoke();
-    this.router.navigate(['login']);
+    this.googleAuthService.revoke();
   }
 
 }

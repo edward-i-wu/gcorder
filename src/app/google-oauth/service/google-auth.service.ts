@@ -1,7 +1,8 @@
 import { NgZone, Injectable } from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import {listenForGoogleUser, listenForSignInState} from './operators';
-import {switchMap} from 'rxjs/operators';
+import {switchMap, take} from 'rxjs/operators';
+import {Router} from '@angular/router';
 
 declare const gapi: any;
 
@@ -13,11 +14,7 @@ export class GoogleAuthService {
   public googleUser$: Observable<gapi.auth2.GoogleUser>;
   public isSignedIn$: Observable<boolean>;
 
-  constructor(private _ngZone: NgZone) { this.init(); }
-
-  get $() {
-    return this.googleAuth$;
-  }
+  constructor(private _ngZone: NgZone, private router: Router) { this.init(); }
 
   init() {
     // TODO move sources to sources.ts once they are independent
@@ -48,8 +45,39 @@ export class GoogleAuthService {
     });
 
     this.googleAuth$ = loadGoogleAuth.pipe(switchMap(() => initGoogleAuth)).shareReplay(1);
-    this.googleUser$ = this.googleAuth$.pipe(listenForGoogleUser()).shareReplay(1);
-    this.isSignedIn$ = this.googleAuth$.pipe(listenForSignInState()).shareReplay(1);
+    this.googleUser$ = this.googleAuth$.pipe(listenForGoogleUser(this._ngZone)).shareReplay(1);
+    this.isSignedIn$ = this.googleAuth$.pipe(listenForSignInState(this._ngZone)).shareReplay(1);
+
+    // TODO don't subscribe in init?
+    this.isSignedIn$.subscribe((isSignedIn: boolean) => {
+      if (isSignedIn) {
+        this.router.navigate(['webrtc']);
+      } else {
+        this.router.navigate(['login']);
+      }
+    });
+  }
+
+  signIn() {
+    // TODO handle error
+    this.googleAuth$.pipe(
+      take(1),
+      switchMap((googleAuth: gapi.auth2.GoogleAuth) => Observable.fromPromise(googleAuth.signIn()))
+    ).subscribe();
+  }
+
+  signOut() {
+    this.googleAuth$.pipe(
+      take(1),
+      switchMap((googleAuth: gapi.auth2.GoogleAuth) => Observable.fromPromise(googleAuth.signOut()))
+    ).subscribe();
+  }
+
+  revoke() {
+    this.googleAuth$.pipe(
+      take(1),
+      switchMap((googleAuth: gapi.auth2.GoogleAuth) => Observable.fromPromise(googleAuth.disconnect()))
+    ).subscribe();
   }
 
 }

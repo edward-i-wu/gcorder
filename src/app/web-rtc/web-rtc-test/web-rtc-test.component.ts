@@ -11,7 +11,6 @@ import {GdriveUploadService} from '../services/gdrive-upload.service';
 import {Scheduler} from 'rxjs/Rx';
 import {ISubscription} from 'rxjs/Subscription';
 import {GoogleAuthService} from '../../google-oauth/service/google-auth.service';
-import {GoogleUserService} from '../../google-oauth/service/google-user.service';
 
 @Component({
   selector: 'app-web-rtc-test',
@@ -47,14 +46,13 @@ export class WebRtcTestComponent implements OnInit, AfterViewChecked {
               private sanitizer: DomSanitizer,
               private googleAuthService: GoogleAuthService,
               private gdriveUpload: GdriveUploadService,
-              private googleUser: GoogleUserService,
               private appRef: ApplicationRef
   ) { }
 
   ngOnInit() {
     this.gdriveUpload.init();
     this.gdriveUpload.$.subscribe(console.log, console.error);
-    this.googleAuth$ = this.googleAuthService.$;
+    this.googleAuth$ = this.googleAuthService.googleAuth$;
     this.googleAuth$.subscribe(auth => this.googleAuth = auth);
     // this.userProfile$ = this.googleAuthService.$.map(auth => auth.currentUser.get().getBasicProfile());
     // TODO hacking change detection b/c I can't figure out running the auth init in ngZone
