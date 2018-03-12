@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
 import {Observable} from 'rxjs/Observable';
-import {IsSignedInService} from '../google-oauth/services/is-signed-in.service';
+import {IsSignedInService} from '../google-oauth/service/is-signed-in.service';
 
 @Injectable()
 export class GoogleAuthGuardService implements CanActivate {

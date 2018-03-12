@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import {GoogleUserService} from './google-oauth/services/google-user.service';
+import {GoogleUserService} from './google-oauth/service/google-user.service';
 import {Router} from '@angular/router';
 
 @Component({

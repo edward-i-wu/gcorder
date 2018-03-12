@@ -10,8 +10,8 @@ import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
 import {GdriveUploadService} from '../services/gdrive-upload.service';
 import {Scheduler} from 'rxjs/Rx';
 import {ISubscription} from 'rxjs/Subscription';
-import {GoogleAuthService} from '../../google-oauth/services/google-auth.service';
-import {GoogleUserService} from '../../google-oauth/services/google-user.service';
+import {GoogleAuthService} from '../../google-oauth/service/google-auth.service';
+import {GoogleUserService} from '../../google-oauth/service/google-user.service';
 
 @Component({
   selector: 'app-web-rtc-test',
@@ -56,12 +56,12 @@ export class WebRtcTestComponent implements OnInit, AfterViewChecked {
     this.gdriveUpload.$.subscribe(console.log, console.error);
     this.googleAuth$ = this.googleAuthService.$;
     this.googleAuth$.subscribe(auth => this.googleAuth = auth);
-    this.userProfile$ = this.googleAuthService.$.map(auth => auth.currentUser.get().getBasicProfile());
+    // this.userProfile$ = this.googleAuthService.$.map(auth => auth.currentUser.get().getBasicProfile());
     // TODO hacking change detection b/c I can't figure out running the auth init in ngZone
-    this.userProfile$.subscribe(userProfile => {
-      this.userProfile = userProfile;
-      this.appRef.tick();
-    }, console.error);
+    // this.userProfile$.subscribe(userProfile => {
+    //   this.userProfile = userProfile;
+    //   this.appRef.tick();
+    // }, console.error);
 
     const stored = localStorage.getItem('mp3');
     if (stored) {
@@ -109,12 +109,9 @@ export class WebRtcTestComponent implements OnInit, AfterViewChecked {
     this.pcmData.stop();
   }
 
-  signIn() {
-    this.googleUser.signIn();
-  }
-
   signOut() {
-    this.googleUser.signOut();
+    // TODO signOut from googleAuthService
+    // this.googleUser.signOut();
   }
 
   initUpload() {

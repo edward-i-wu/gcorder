@@ -5,7 +5,7 @@ import {Observable} from 'rxjs/Observable';
 import {Subject} from 'rxjs/Subject';
 import {Subscription} from 'rxjs/Subscription';
 import {ClientLoadService} from './client-load.service';
-import {GoogleAuthService} from '../../google-oauth/services/google-auth.service';
+import {GoogleAuthService} from '../../google-oauth/service/google-auth.service';
 
 @Injectable()
 export class GdriveUploadService implements OnDestroy {

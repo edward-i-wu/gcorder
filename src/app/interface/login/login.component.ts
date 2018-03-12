@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import {GoogleAuthService} from '../../google-oauth/services/google-auth.service';
+import {GoogleAuthService} from '../../google-oauth/service/google-auth.service';
 import {Observable} from 'rxjs/Observable';
 import {Router} from '@angular/router';
-import {GoogleUserService} from '../../google-oauth/services/google-user.service';
-import {IsSignedInService} from '../../google-oauth/services/is-signed-in.service';
+import {IsSignedInService} from '../../google-oauth/service/is-signed-in.service';
 
 @Component({
   selector: 'app-login',
@@ -14,7 +13,7 @@ export class LoginComponent implements OnInit {
 
   public googleUser$: Observable<any>;
 
-  constructor(private googleUser: GoogleUserService, private isSignedIn: IsSignedInService, private router: Router) { }
+  constructor(private googleAuthService: GoogleAuthService, private isSignedIn: IsSignedInService, private router: Router) { }
 
   ngOnInit() {
     this.isSignedIn.$.subscribe(isSignedIn => {
@@ -26,7 +25,9 @@ export class LoginComponent implements OnInit {
   }
 
   signIn() {
-    this.isSignedIn.signIn();
+    this.googleAuthService.$.take(1)
+      .switchMap(googleAuth => Observable.fromPromise(googleAuth.signIn()))
+      .subscribe();
   }
 
 }
