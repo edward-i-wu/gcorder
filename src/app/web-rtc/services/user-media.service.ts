@@ -14,8 +14,7 @@ export class UserMediaService {
   private sourceSwitch$ = new ReplaySubject<Observable<MediaStream>>(1);
   private mediaStream$: Observable<MediaStream> = this.sourceSwitch$
     .switchMap((obs) => obs)
-    .multicast(new Subject())
-    .refCount();
+    .shareReplay(1);
 
   constructor() { }
 
@@ -29,8 +28,7 @@ export class UserMediaService {
     // we must defer the fromPromise to make it a "cold" observable. Otherwise errors get thrown before there are subscribers
     const deferredPromise$ = Observable.defer(() => {
       return Observable.fromPromise(navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: { width: 200, height: 200 }
+        audio: true
       }));
     });
 
