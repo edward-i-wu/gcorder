@@ -6,7 +6,3 @@ export function getUserMedia(constraints: MediaStreamConstraints): Observable<Me
     return Observable.fromPromise(navigator.mediaDevices.getUserMedia(constraints));
   });
 }
-
-export function createAudioContext(): Observable<AudioContext> {
-  return new Observable(observer => observer.next(new AudioContext()));
-}

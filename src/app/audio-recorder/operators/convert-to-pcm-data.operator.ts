@@ -1,6 +1,7 @@
 import {Observable} from 'rxjs/Observable';
 import {mergeAll, zip} from 'rxjs/operators';
 
+// TODO need complete and error functions
 export function convertToPcmData(audioContext$: Observable<AudioContext>, bufferSize: number) {
   return (mediaStream$: Observable<MediaStream>) => {
     const createPCMStream = zip(audioContext$, (mediaStream: MediaStream, audioContext: AudioContext) => {

@@ -30,7 +30,6 @@ export class BlobBufferService implements OnDestroy {
           // maybe this could be done with pipe? Write a custom operator?
           if (data.byteLength + this.blobSize > BUFFER_SIZE) {
             const splitIndex = ((data.byteLength + this.blobSize) - BUFFER_SIZE) / data.BYTES_PER_ELEMENT;
-            // TODO why do I have to do this to the index?
             const lastChunk = data.slice(0, data.length - splitIndex);
             const nextChunk = data.slice(data.length - splitIndex);
 

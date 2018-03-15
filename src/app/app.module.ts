@@ -8,6 +8,7 @@ import {InterfaceModule} from './interface/interface.module';
 import {MatButtonModule, MatIconModule, MatMenuModule, MatSidenavModule} from '@angular/material';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {GoogleOauthModule} from './google-oauth/google-oauth.module';
+import {AudioRecorderModule} from './audio-recorder/audio-recorder.module';
 
 @NgModule({
   declarations: [
@@ -19,6 +20,7 @@ import {GoogleOauthModule} from './google-oauth/google-oauth.module';
     WebRtcModule.forRoot(),
     InterfaceModule.forRoot(),
     GoogleOauthModule.forRoot(),
+    AudioRecorderModule.forRoot(),
     RoutingModule,
     MatMenuModule,
     MatIconModule,
