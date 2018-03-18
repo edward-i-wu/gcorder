@@ -1,6 +1,6 @@
 import {Observable} from 'rxjs/Observable';
 
-export function toBlob(bufferSize: number) {
+export function toBlob(bufferSize: number): (number) => Observable<Blob> {
   // TODO generalize to TypedArray
   return (source: Observable<Int8Array>) => new Observable(observer => {
     let buffer: Int8Array[] = [];
@@ -12,8 +12,8 @@ export function toBlob(bufferSize: number) {
         const lastChunk = chunk.slice(0, chunk.length - splitIndex);
         const nextChunk = chunk.slice(chunk.length - splitIndex);
 
-        this.buffer.push(lastChunk);
-        observer.next(new Blob(this.buffer));
+        buffer.push(lastChunk);
+        observer.next(new Blob(buffer));
         buffer = [];
         blobSize = 0;
         next(nextChunk); // in case nextChunk.byteLength > bufferSize. This might cause race condition?

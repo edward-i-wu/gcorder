@@ -51,7 +51,7 @@ export class GoogleAuthService {
     // TODO don't subscribe in init?
     this.isSignedIn$.subscribe((isSignedIn: boolean) => {
       if (isSignedIn) {
-        this.router.navigate(['webrtc']);
+        this.router.navigate(['recorder']);
       } else {
         this.router.navigate(['login']);
       }

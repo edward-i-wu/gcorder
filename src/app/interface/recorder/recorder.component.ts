@@ -2,22 +2,20 @@ import {
   AfterViewChecked, ApplicationRef, Component, ElementRef, NgZone, OnChanges, OnInit,
   ViewChild
 } from '@angular/core';
-import {UserMediaService} from '../services/user-media.service';
-import {PcmDataService} from '../services/pcm-data.service';
-import {Mp3BlobService} from '../services/mp3-blob.service';
 import {Observable} from 'rxjs/Observable';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
-import {GdriveUploadService} from '../services/gdrive-upload.service';
 import {Scheduler} from 'rxjs/Rx';
 import {ISubscription} from 'rxjs/Subscription';
 import {GoogleAuthService} from '../../google-oauth/service/google-auth.service';
+import {AudioRecorderService, RecordingSession} from '../../audio-recorder/audio-recorder.service';
+import {ResumeableUploadService} from '../../google-drive/resumeable-upload.service';
 
 @Component({
-  selector: 'app-web-rtc-test',
-  templateUrl: './web-rtc-test.component.html',
-  styleUrls: ['./web-rtc-test.component.scss']
+  selector: 'app-recorder',
+  templateUrl: './recorder.component.html',
+  styleUrls: ['./recorder.component.scss']
 })
-export class WebRtcTestComponent implements OnInit, AfterViewChecked {
+export class RecorderComponent implements OnInit, AfterViewChecked {
 
   public mp3Url$: Observable<SafeResourceUrl> = Observable.never();
 
@@ -27,11 +25,10 @@ export class WebRtcTestComponent implements OnInit, AfterViewChecked {
   private prevAudioSrc: String;
 
   public storedMp3: SafeResourceUrl;
-  private accessToken: string;
-  public userProfile$: Observable<any>;
-  public userProfile;
-  public googleAuth$: Observable<any>;
-  public googleAuth;
+  private accessToken$: Observable<string>;
+
+  private recordingSession: RecordingSession;
+
   public paused = true;
   public recording = false;
   private startTime: Date;
@@ -40,51 +37,22 @@ export class WebRtcTestComponent implements OnInit, AfterViewChecked {
   private timeControl: ISubscription;
 
 
-  constructor(private userMedia: UserMediaService,
-              private pcmData: PcmDataService,
-              private mp3Blob: Mp3BlobService,
-              private sanitizer: DomSanitizer,
+  constructor(private sanitizer: DomSanitizer,
               private googleAuthService: GoogleAuthService,
-              private gdriveUpload: GdriveUploadService,
+              private resumeableUpload: ResumeableUploadService,
+              private audioRecorder: AudioRecorderService,
               private appRef: ApplicationRef
   ) { }
 
   ngOnInit() {
-    this.gdriveUpload.init();
-    this.gdriveUpload.$.subscribe(console.log, console.error);
-    this.googleAuth$ = this.googleAuthService.googleAuth$;
-    this.googleAuth$.subscribe(auth => this.googleAuth = auth);
-    // this.userProfile$ = this.googleAuthService.$.map(auth => auth.currentUser.get().getBasicProfile());
-    // TODO hacking change detection b/c I can't figure out running the auth init in ngZone
-    // this.userProfile$.subscribe(userProfile => {
-    //   this.userProfile = userProfile;
-    //   this.appRef.tick();
-    // }, console.error);
-
     const stored = localStorage.getItem('mp3');
     if (stored) {
       this.storedMp3 = this.sanitizer.bypassSecurityTrustResourceUrl(stored);
-      this.playback.nativeElement.load();
+      setTimeout(() => this.playback.nativeElement.load(), 0);
     }
-
-
-    this.userMedia.getUserMedia();
-
-    this.mp3Url$ = this.mp3Blob.$
-      .map((blob: Blob) => {
-      // TODO put in a function
-        const fr = new FileReader();
-        fr.onload = (e) => {
-          if (e.type === 'load') {
-            console.log(fr.result);
-            localStorage.setItem('mp3', fr.result);
-          }
-        };
-        fr.readAsDataURL(blob);
-
-        return this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(blob));
-      })
-      .do((blob) => console.log(blob), () => console.log('error'), () => console.log('complete'));
+    this.accessToken$ = this.googleAuthService.googleUser$.map((user: gapi.auth2.GoogleUser) => {
+      return user.getAuthResponse(true).access_token;
+    });
   }
 
   ngAfterViewChecked() {
@@ -94,28 +62,50 @@ export class WebRtcTestComponent implements OnInit, AfterViewChecked {
     }
   }
 
+  getStoredMp3() {
+    const stored = localStorage.getItem('mp3');
+    if (stored) {
+      return this.sanitizer.bypassSecurityTrustResourceUrl(stored);
+      // this.playback.nativeElement.load();
+    }
+  }
+
+  private setMp3$() {
+    this.mp3Url$ = this.recordingSession.mp3Complete$
+      .map((blob: Blob) => {
+        // TODO put in a function
+        const fr = new FileReader();
+        fr.onload = (e) => {
+          if (e.type === 'load') {
+            localStorage.setItem('mp3', fr.result);
+          }
+        };
+        fr.readAsDataURL(blob);
+
+        return this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(blob));
+      });
+      // .do((blob) => console.log(blob), () => console.log('error'), () => console.log('complete'));
+  }
+
   start() {
-    this.mp3Blob.init();
-    this.pcmData.start();
+    this.recordingSession = this.audioRecorder.createRecordingSession(); // ensure this is stopped before dropping reference
+    // this.gdriveUpload.init(this.recordingSession.mp3Chunk$); // make into operator
+    // this.gdriveUpload.$.subscribe(); // start upload
+    this.resumeableUpload.uploadBinary(this.recordingSession.mp3Chunk$, this.accessToken$).subscribe();
+    this.setMp3$();
+    this.recordingSession.start();
   }
 
   pause() {
-    this.pcmData.pause();
+    this.recordingSession.pause();
   }
 
   stop() {
-    this.pcmData.stop();
+    this.recordingSession.stop();
   }
 
-  signOut() {
-    // TODO signOut from googleAuthService
-    // this.googleUser.signOut();
-  }
 
-  initUpload() {
-    this.appRef.tick();
-  }
-
+  // ui logic
   record() {
     this.recording = true;
     if (this.paused) {

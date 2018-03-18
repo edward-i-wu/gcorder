@@ -6,60 +6,87 @@ import {createAudioContext} from './sources/create-audio-context.source';
 import {mp3Encode} from './operators/mp3-encode.operator';
 import {toBlob} from './operators/to-blob.operator';
 import {aggregateBlobs} from './operators/aggregate-blobs.operator';
-import {takeUntil} from 'rxjs/operators';
+import {share, switchMap, takeUntil} from 'rxjs/operators';
 import {Subject} from 'rxjs/Subject';
 import {ISubscription} from 'rxjs/Subscription';
 import {ConnectableObservable} from 'rxjs/Rx';
+import {ReplaySubject} from 'rxjs/ReplaySubject';
 
 // TODO fetch from environment?
 const mediaConstraints = { audio: true };
 const pcmDataBufferSize = 2048;
-const blobBufferSize = 256 * 1024;
+const BUFFER_SIZE = 256 * 1024;
 
 @Injectable()
 export class AudioRecorderService {
 
-  public mediaStream$: Observable<MediaStream>;
-  public pcmData$: ConnectableObservable<Int16Array>;
+  private mediaStreamSwitch$: ReplaySubject<Observable<MediaStream>> = new ReplaySubject(1);
+  private pcmDataSwitch$: ReplaySubject<Observable<Int16Array>> = new ReplaySubject(1);
+
+  constructor() { this.init(); }
+
+  get mediaStream$() {
+    return this.mediaStreamSwitch$.pipe(switchMap((obs: Observable<MediaStream>) => obs));
+  }
+
+  get pcmData$() {
+    return this.pcmDataSwitch$.pipe(switchMap((obs: Observable<Int16Array>) => obs));
+  }
+
+  createRecordingSession() {
+    return new RecordingSession(this.pcmData$);
+  }
+
+  public init() {
+    const audioContext$ = createAudioContext();
+
+    this.mediaStreamSwitch$.next(getUserMedia(mediaConstraints));
+
+    this.pcmDataSwitch$.next(
+      this.mediaStream$.pipe(
+        convertToPcmData(audioContext$, pcmDataBufferSize),
+        share()
+      )
+    );
+  }
+
+}
+
+export class RecordingSession {
+
   public mp3Chunk$: Observable<Blob>;
   public mp3Complete$: Observable<Blob>;
 
-  private recordEnd$: Subject<void> = new Subject<void>();
-  private recording: ISubscription;
+  private streamControl: ConnectableObservable<Int16Array>;
+  private startStream: ISubscription;
+  private endStream: Subject<void> = new Subject<void>();
+
+  constructor(pcmData$: Observable<Int16Array>) {
+    this.streamControl = pcmData$.publish();
+    this.mp3Chunk$ = this.streamControl.pipe(
+      takeUntil(this.endStream),
+      mp3Encode(), // TODO encoder should be bundled with pcmData$. Need to figure out how to have pcmData$ initialize only after subscription
+      share(),
+      toBlob(BUFFER_SIZE)
+    );
+    this.mp3Complete$ = this.mp3Chunk$.pipe(
+      aggregateBlobs('audio/mp3')
+    );
+  }
 
   start() {
-    this.recording = this.pcmData$.connect();
+    this.startStream = this.streamControl.connect();
   }
 
   pause() {
-    if (this.recording !== null) {
-      this.recording.unsubscribe();
+    if (this.startStream !== null) {
+      this.startStream.unsubscribe();
     }
   }
 
   stop() {
-    this.recordEnd$.next();
-    this.recording.unsubscribe();
-  }
-
-  init() {
-    const audioContext$ = createAudioContext();
-
-    this.mediaStream$ = getUserMedia(mediaConstraints);
-
-    this.pcmData$ = this.mediaStream$.pipe(
-      convertToPcmData(audioContext$, pcmDataBufferSize),
-      takeUntil(this.recordEnd$)
-    ).multicast(new Subject()); // TODO using patch operator. Need to figure out type error
-
-    this.mp3Chunk$ = this.pcmData$.pipe(
-      mp3Encode(),
-      toBlob(blobBufferSize)
-    );
-
-    this.mp3Complete$ = this.mp3Chunk$.pipe(
-      aggregateBlobs('audio/mp3')
-    );
+    this.endStream.next();
+    this.startStream.unsubscribe();
   }
 
 }

@@ -1,5 +1,5 @@
 import {Observable} from 'rxjs/Observable';
-import {mergeAll, zip} from 'rxjs/operators';
+import {mergeAll, switchMap, zip} from 'rxjs/operators';
 
 // TODO need complete and error functions
 export function convertToPcmData(audioContext$: Observable<AudioContext>, bufferSize: number) {
@@ -19,7 +19,7 @@ export function convertToPcmData(audioContext$: Observable<AudioContext>, buffer
         source.connect(processor);
       });
     });
-    return mediaStream$.pipe(createPCMStream, mergeAll());
+    return mediaStream$.pipe(createPCMStream, switchMap((obs: Observable<Int16Array>) => obs));
   };
 }
 

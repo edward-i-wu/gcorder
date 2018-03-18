@@ -1,20 +1,19 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {RecorderComponent} from './recorder.component';
 
-import { WebRtcTestComponent } from './web-rtc-test.component';
-
-describe('WebRtcTestComponent', () => {
-  let component: WebRtcTestComponent;
-  let fixture: ComponentFixture<WebRtcTestComponent>;
+describe('RecorderComponent', () => {
+  let component: RecorderComponent;
+  let fixture: ComponentFixture<RecorderComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ WebRtcTestComponent ]
+      declarations: [ RecorderComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(WebRtcTestComponent);
+    fixture = TestBed.createComponent(RecorderComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
