@@ -1,27 +1,23 @@
 # Gcorder
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.4.4.
+An Angular SPA that captures audio from the microphone and live uploads it directly to your google drive.
 
-## Development server
+## Getting Started
+- `npm install`
+- [get your own developer clientId for google drive](https://developers.google.com/identity/sign-in/web/sign-in)
+- create your environment as detailed in `src/environments/environment.sample.ts`
+- `npm run serve`
+- `http://localhost:4200`
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+## Sweet Snippets
+- [custom rxjs operators](https://github.com/nigel-smk/gcorder/tree/develop/src/app/audio-recorder/operators)
+- [live mp3 encoding with a web worker initialized by the rxjs `using` operator](https://github.com/nigel-smk/gcorder/blob/develop/src/app/audio-recorder/operators/mp3-encode.operator.ts)
+  - [the web worker](https://github.com/nigel-smk/gcorder/blob/develop/src/worker/worker.js)
+  - [angular cli configuration](https://github.com/nigel-smk/gcorder/blob/develop/.angular-cli.json#L10-L22)
+- [integrating the Google gapi.auth2 library with Angular](https://github.com/nigel-smk/gcorder/blob/develop/src/app/google-oauth/google-auth.service.ts)
+  - [using ngZone.run() to re-enter the Angular zone](https://github.com/nigel-smk/gcorder/blob/develop/src/app/google-oauth/google-auth.service.ts#L23)
+- ["live" uploading files with Google Drive's resumeable upload](https://github.com/nigel-smk/gcorder/blob/develop/src/app/google-drive/resumeable-upload.service.ts)
+- [nifty css transitions](https://github.com/nigel-smk/gcorder/blob/develop/src/app/interface/recorder/recorder.component.scss#L21)
+- [an attempt to intercept 308 responses to mark them as successes](https://github.com/nigel-smk/gcorder/blob/develop/src/app/interface/resumable308-interceptor.service.ts)
 
-## Code scaffolding
-
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
-
-## Build
-
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `-prod` flag for a production build.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+Unsolicited code reviews welcomed!
