@@ -3,7 +3,7 @@ import {Observable} from 'rxjs/Observable';
 import {listenForGoogleUser, listenForSignInState} from './operators';
 import {switchMap, take} from 'rxjs/operators';
 import {Router} from '@angular/router';
-import {environment} from '../../../environments/environment';
+import {environment} from '../../environments/environment';
 
 declare const gapi: any;
 

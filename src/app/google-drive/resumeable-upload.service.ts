@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs/Observable';
 import {initializeResumeableUpload} from './initialize-resumeable-upload.source';
-import {uploadBlobs} from './upload-chunks.operator';
+import {uploadBlobs} from './upload-chunks.source';
 
 @Injectable()
 export class ResumeableUploadService {
