@@ -10,7 +10,6 @@ declare const gapi: any;
 @Injectable()
 export class GoogleAuthService {
 
-  // TODO GoogleAuth type
   public googleAuth$: Observable<gapi.auth2.GoogleAuth>;
   public googleUser$: Observable<gapi.auth2.GoogleUser>;
   public isSignedIn$: Observable<boolean>;

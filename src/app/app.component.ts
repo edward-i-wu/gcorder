@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 
-import {GoogleAuthService} from './google-oauth/service/google-auth.service';
+import {GoogleAuthService} from './google-oauth/google-auth.service';
 
 @Component({
   selector: 'app-root',

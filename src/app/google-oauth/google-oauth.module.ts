@@ -1,6 +1,6 @@
 import {ModuleWithProviders, NgModule} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {GoogleAuthService} from './service/google-auth.service';
+import {GoogleAuthService} from './google-auth.service';
 
 @NgModule({
   imports: [

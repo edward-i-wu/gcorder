@@ -6,7 +6,7 @@ import {Observable} from 'rxjs/Observable';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
 import {Scheduler} from 'rxjs/Rx';
 import {ISubscription} from 'rxjs/Subscription';
-import {GoogleAuthService} from '../../google-oauth/service/google-auth.service';
+import {GoogleAuthService} from '../../google-oauth/google-auth.service';
 import {AudioRecorderService, RecordingSession} from '../../audio-recorder/audio-recorder.service';
 import {ResumeableUploadService} from '../../google-drive/resumeable-upload.service';
 
