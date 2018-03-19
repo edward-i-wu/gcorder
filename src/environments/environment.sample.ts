@@ -4,5 +4,11 @@
 // The list of which env maps to which file can be found in `.angular-cli.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  clientId: '<your google drive client id>',
+  mediaConstraints: { audio: true }, // passed to getUserMedia
+  pcmDataBufferSize: 2048,  // buffer size for pcm data
+  driveUploadBufferSize: 256 * 1024 // buffer size for drive upload
 };
+
+// you must create an environment.ts file in this directory with these values

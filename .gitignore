@@ -1,4 +1,6 @@
-# See http://help.github.com/ignore-files/ for more about ignoring files.
+# environments can't be made public
+/src/environments/*
+!/src/environments/environment.sample.ts
 
 # compiled output
 /dist

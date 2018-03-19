@@ -1,9 +1,9 @@
 import {HttpClient, HttpErrorResponse, HttpHeaders, HttpResponseBase} from '@angular/common/http';
 import {Observable} from 'rxjs/Observable';
 import {switchMap, take, takeWhile} from 'rxjs/operators';
+import {environment} from '../../environments/environment';
 
-// TODO import from environment?
-const BUFFER_SIZE = 256 * 1024;
+const driveUploadBufferSize = environment.driveUploadBufferSize;
 
 export function uploadBlobs(http: HttpClient, location$: Observable<string>, blob$: Observable<Blob>) {
   let byteProgress = 0;
@@ -17,7 +17,7 @@ export function uploadBlobs(http: HttpClient, location$: Observable<string>, blo
         responseType: 'text' as 'json',
         headers: new HttpHeaders({
           'Content-Type': 'audio/mp3',
-          'Content-Range': `bytes ${byteProgress}-${byteProgress + blob.size - 1}/${blob.size < BUFFER_SIZE ? byteProgress + blob.size : '*'}`
+          'Content-Range': `bytes ${byteProgress}-${byteProgress + blob.size - 1}/${blob.size < driveUploadBufferSize ? byteProgress + blob.size : '*'}`
         })
       }
     ).catch((error: HttpErrorResponse) => {

@@ -3,6 +3,7 @@ import {Observable} from 'rxjs/Observable';
 import {listenForGoogleUser, listenForSignInState} from './operators';
 import {switchMap, take} from 'rxjs/operators';
 import {Router} from '@angular/router';
+import {environment} from '../../../environments/environment';
 
 declare const gapi: any;
 
@@ -34,7 +35,7 @@ export class GoogleAuthService {
     const initGoogleAuth = new Observable<gapi.auth2.GoogleAuth>((observer) => {
       // TODO should this complete?
       gapi.auth2.init({
-        client_id: '1001160351132-p1fh24qd1s7ne1ffd6fj6nhil67nao39.apps.googleusercontent.com',
+        client_id: environment.clientId,
         scope: 'https://www.googleapis.com/auth/drive.file'
       }).then((googleAuth) => {
           this._ngZone.run(() => observer.next(googleAuth));

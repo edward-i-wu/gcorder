@@ -11,11 +11,11 @@ import {Subject} from 'rxjs/Subject';
 import {ISubscription} from 'rxjs/Subscription';
 import {ConnectableObservable} from 'rxjs/Rx';
 import {ReplaySubject} from 'rxjs/ReplaySubject';
+import {environment} from '../../environments/environment';
 
-// TODO fetch from environment?
-const mediaConstraints = { audio: true };
-const pcmDataBufferSize = 2048;
-const BUFFER_SIZE = 256 * 1024;
+const mediaConstraints = environment.mediaConstraints;
+const pcmDataBufferSize = environment.pcmDataBufferSize;
+const driveUploadBufferSize = environment.driveUploadBufferSize;
 
 @Injectable()
 export class AudioRecorderService {
@@ -67,7 +67,7 @@ export class RecordingSession {
       takeUntil(this.endStream),
       mp3Encode(), // TODO encoder should be bundled with pcmData$. Need to figure out how to have pcmData$ initialize only after subscription
       share(),
-      toBlob(BUFFER_SIZE)
+      toBlob(driveUploadBufferSize)
     );
     this.mp3Complete$ = this.mp3Chunk$.pipe(
       aggregateBlobs('audio/mp3')
